@@ -1,9 +1,16 @@
 version: "3.7"
 services:
+  corebase:
+    build:
+      context: ./base
+      dockerfile: Dockerfile
+      target: corebase
+    image: "drudge:corebase"
   base:
     build:
       context: ./base
       dockerfile: Dockerfile
+      target: base
     image: "drudge:base"
   drudge:
     build:

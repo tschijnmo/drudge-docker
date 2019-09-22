@@ -1,33 +1,48 @@
-# The basic base image for drudge development and execution.
 #
-# Starting with GCC, which is generally the hardest to get up-to-date, we
-# install the cutting-edge Python and Spark, as well as some smaller
-# dependencies of the drudge stack that is updated relatively infrequently.
+# The basic base images for drudge development and execution
+# ==========================================================
 #
-# For convenience of development, utilities like vim/tmux are included, and the
-# apt cache lists are not cleared.
-FROM gcc:9.2.0
 
+# Base image for C++ library developments.
 #
-# Basic runtime dependencies
+# Starting with GCC, which is generally the hardest to get up-to-date, tools
+# like cmake and gdb are installed.  For convenience of development, utilities
+# like vim/tmux are also included, and the apt cache lists are not cleared.
 #
-# Sid is added for Java 8, which is required for Spark.
+# This stage is designed to be used in the development of core C++ libraries
+# like libcanon or libparenth.
+FROM gcc:9.2.0 AS corebase
+
 RUN set -ex; \
-	echo "deb http://ftp.us.debian.org/debian sid main" >> /etc/apt/sources.list; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 	    cmake \
-	    openjdk-8-jre \
-	    tk-dev \
+	    gdb \
+	    man \
 	    tmux \
-	    uuid-dev \
 	    vim \
 	    ;
 
+COPY gdbinit /etc/gdb/gdbinit
+
+WORKDIR /home/src
+CMD bash
+
+
+# Image for actual drudge development and execution.
 #
+# In addition to things in the core base, here the cutting edge Python and
+# Spark are installed, as well as some other small Python runtime dependencies.
+FROM corebase AS base
+
 # Python
 #
 # The entire code is adapted from the official Python docker file.
+RUN set -ex; \
+	apt-get install -y --no-install-recommends \
+	    tk-dev \
+	    uuid-dev \
+	    ;
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
@@ -156,9 +171,13 @@ RUN set -ex \
 	&& cd .. && rm -rf DummyRDD
 
 
-#
 # Spark
 #
+# Sid is first added for Java 8, which is required for Spark.
+RUN set -ex; \
+	echo "deb http://ftp.us.debian.org/debian sid main" >> /etc/apt/sources.list; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends  openjdk-8-jre;
 
 # Install Spark runtime.
 RUN set -ex \
@@ -174,12 +193,3 @@ ENV PYSPARK_PYTHON /usr/local/bin/python3
 ENV PYSPARK_DRIVER_PYTHON ${PYSPARK_PYTHON}
 ENV PYTHONPATH ${PYTHONPATH}:${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.4-src.zip
 ENV SPARK_LOCAL_IP 127.0.0.1
-
-
-#
-# Misc settings
-#
-
-WORKDIR /home/src
-CMD bash
-
