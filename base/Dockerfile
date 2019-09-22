@@ -3,21 +3,26 @@
 # Starting with GCC, which is generally the hardest to get up-to-date, we
 # install the cutting-edge Python and Spark, as well as some smaller
 # dependencies of the drudge stack that is updated relatively infrequently.
+#
+# For convenience of development, utilities like vim/tmux are included, and the
+# apt cache lists are not cleared.
 FROM gcc:9.2.0
 
 #
 # Basic runtime dependencies
 #
-# tk and uuid is for Python.
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Sid is added for Java 8, which is required for Spark.
+RUN set -ex; \
+	echo "deb http://ftp.us.debian.org/debian sid main" >> /etc/apt/sources.list; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 	    cmake \
-	    openjdk-11-jre \
-	    openjdk-11-jdk \
+	    openjdk-8-jre \
 	    tk-dev \
+	    tmux \
 	    uuid-dev \
-	&& rm -rf /var/lib/apt/lists/*
-
+	    vim \
+	    ;
 
 #
 # Python
@@ -163,6 +168,7 @@ RUN set -ex \
     && rm spark.tar.gz
 
 # Set the environment variables up.
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
 ENV SPARK_HOME /usr/local/spark
 ENV PYSPARK_PYTHON /usr/local/bin/python3
 ENV PYSPARK_DRIVER_PYTHON ${PYSPARK_PYTHON}
