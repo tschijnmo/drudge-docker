@@ -18,3 +18,15 @@ publishing into a remote registry, proper tagging is needed.  Different stages
 in the stack are tagged with plain name, with `-latest` omitted for
 convenience.  Specific versions will be marked when needed.
 
+
+Development workflow
+--------------------
+
+In addition to being the platform to build docker images for drudge, this
+repository can also serve as the ground for drudge development.  The images can
+be easily launched as services, with the source tree and a swap working
+directory on the host machine mounted for convenience.  For instance, to do
+some drudge development, `docker-compose up drudge` can be followed by a
+`docker exec -it` in the launched container to do the development.  Changes to
+the source code can immediately be visible.
+

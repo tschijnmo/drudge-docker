@@ -5,3 +5,17 @@ services:
       context: ./base
       dockerfile: Dockerfile
     image: "drudge:base"
+  drudge:
+    build:
+      context: ./drudge
+      dockerfile: Dockerfile
+    image: "drudge:drudge"
+    # Service for developmental purpose.
+    volumes:
+      - type: bind
+        source: ./drudge
+        target: /home/src/drudge
+      - type: bind
+        source: ./work
+        target: /home/work
+    command: ["sleep", "infinity"]

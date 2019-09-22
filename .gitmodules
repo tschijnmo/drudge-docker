@@ -1,0 +1,3 @@
+[submodule "drudge"]
+	path = drudge
+	url = https://github.com/tschijnmo/drudge.git
