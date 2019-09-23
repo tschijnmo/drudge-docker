@@ -6,12 +6,14 @@ services:
       dockerfile: Dockerfile
       target: corebase
     image: "drudge:corebase"
+
   base:
     build:
       context: ./base
       dockerfile: Dockerfile
       target: base
     image: "drudge:base"
+
   drudge:
     build:
       context: ./drudge
@@ -22,6 +24,20 @@ services:
       - type: bind
         source: ./drudge
         target: /home/src/drudge
+      - type: bind
+        source: ./work
+        target: /home/work
+    command: ["sleep", "infinity"]
+
+  gristmill:
+    build:
+      context: ./gristmill
+      dockerfile: Dockerfile
+    image: "drudge:gristmill"
+    volumes:
+      - type: bind
+        source: ./gristmill
+        target: /home/src/gristmill
       - type: bind
         source: ./work
         target: /home/work

@@ -1,3 +1,6 @@
 [submodule "drudge"]
 	path = drudge
 	url = https://github.com/tschijnmo/drudge.git
+[submodule "gristmill"]
+	path = gristmill
+	url = https://github.com/tschijnmo/gristmill.git
